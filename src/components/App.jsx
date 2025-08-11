@@ -1,7 +1,10 @@
 import "../styles/tailwind.css";
-import { Star, Zap, Users, BookOpen, Menu, X } from "lucide-react";
+import { Star, Users, BookOpen, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import Characters from "./pages/Characters";
+import StorySection from "./pages/StorySection";
+import HomeSection from "./layout/HomeSection";
+import Footer from "./layout/Footer";
 
 function App() {
   const [activeSection, setActiveSection] = useState("home");
@@ -9,6 +12,9 @@ function App() {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [minKi, setMinKi] = useState(0);
+  const [maxKi, setMaxKi] = useState(1e25);
 
   useEffect(() => {
     const el = document.getElementById("characters");
@@ -65,6 +71,7 @@ function App() {
     fetchAllCharacters();
   }, []);
 
+  // eslint-disable-next-line no-unused-vars
   const NavButton = ({ section, icon: Icon, label, isActive }) => (
     <button
       onClick={() => {
@@ -87,6 +94,54 @@ function App() {
     const index = text.indexOf(".");
     return index !== -1 ? text.slice(0, index + 1) : text;
   }
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // FUNCIONES para calcular el valor de ki y pasar las palabras a números
+
+  function parseKiString(kiString) {
+    if (!kiString) return 0;
+
+    const text = kiString.toLowerCase().trim();
+
+    const multipliers = {
+      septillion: 1e24,
+      quintillion: 1e18,
+      quadrillion: 1e15,
+      trillion: 1e12,
+      billion: 1e9,
+    };
+
+    // Buscar sufijo y extraer número antes del sufijo
+    for (const [key, value] of Object.entries(multipliers)) {
+      if (text.includes(key)) {
+        // Extraer el número antes del sufijo (ej: "5.5 billion")
+        const match = text.match(/([\d,.]+)\s*/);
+        if (match) {
+          // Reemplazar comas y convertir a float
+          const numberPart = parseFloat(match[1].replace(/,/g, ""));
+          return isNaN(numberPart) ? 0 : numberPart * value;
+        }
+        return 0;
+      }
+    }
+
+    // Si no tiene sufijo, intentar parsear directamente como número
+
+    const num = parseFloat(text.replace(/[^0-9.]/g, ""));
+    return isNaN(num) ? 0 : num;
+  }
+
+  const filteredByName = characters.filter((char) =>
+    char.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredByKi = filteredByName.filter((char) => {
+    const kiValue = parseKiString(char.ki);
+    return kiValue >= minKi && kiValue <= maxKi;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-orange-900">
@@ -162,113 +217,30 @@ function App() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Home Section */}
-        {activeSection === "home" && (
-          <div className="space-y-8">
-            <div className="text-center">
-              <h2 className="text-5xl font-bold leading-[1.3] bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">
-                ¡Bienvenido al Universo Dragon Ball!
-              </h2>
-              <p className="text-xl text-white/90 max-w-3xl mx-auto">
-                Explora el increíble mundo de Dragon Ball, conoce a tus
-                personajes favoritos y descubre las legendarias Esferas del
-                Dragón.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              <div
-                onClick={() => setActiveSection("characters")}
-                className="bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-sm rounded-xl p-6 border border-orange-300/20 cursor-pointer"
-              >
-                <Users className="text-orange-400 mb-4" size={32} />
-                <h3 className="text-xl font-bold text-white mb-2">
-                  Personajes Épicos
-                </h3>
-                <p className="text-white/80">
-                  Conoce a los guerreros más poderosos del universo
-                </p>
-              </div>
-
-              <div
-                onClick={() => setActiveSection("story")}
-                className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm rounded-xl p-6 border border-yellow-300/20 cursor-pointer"
-              >
-                <BookOpen className="text-yellow-400 mb-4" size={32} />
-                <h3 className="text-xl font-bold text-white mb-2">
-                  Historia Épica
-                </h3>
-                <p className="text-white/80">
-                  Revive las aventuras más emocionantes
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        <HomeSection
+          setActiveSection={setActiveSection}
+          activeSection={activeSection}
+        />
         {/* Characters Section */}
         <Characters
-          characters={characters}
+          handleSearchChange={handleSearchChange}
+          searchTerm={searchTerm}
+          characters={filteredByKi}
+          minKi={minKi}
+          maxKi={maxKi}
+          setMinKi={setMinKi}
+          setMaxKi={setMaxKi}
           activeSection={activeSection}
           summaryUpToTheFirstPoint={summaryUpToTheFirstPoint}
           loading={loading}
           error={error}
         />
         {/* Story Section */}
-        {activeSection === "story" && (
-          <div id="story" className="space-y-8 max-w-4xl mx-auto">
-            <h2 className="text-4xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              La Historia de Dragon Ball
-            </h2>
-
-            <div className="space-y-6">
-              <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-xl p-6 border border-blue-300/20">
-                <h3 className="text-2xl font-bold text-white mb-4">
-                  🥋 Dragon Ball
-                </h3>
-                <p className="text-white/90 leading-relaxed">
-                  La aventura comienza con un joven Goku que vive solo en las
-                  montañas. Su encuentro con Bulma lo lleva a embarcarse en una
-                  búsqueda épica de las siete Esferas del Dragón, objetos
-                  mágicos que pueden conceder cualquier deseo.
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-sm rounded-xl p-6 border border-orange-300/20">
-                <h3 className="text-2xl font-bold text-white mb-4">
-                  ⚡ Dragon Ball Z
-                </h3>
-                <p className="text-white/90 leading-relaxed">
-                  Goku descubre sus orígenes como Saiyajin mientras la Tierra
-                  enfrenta amenazas cada vez más poderosas. Desde la llegada de
-                  Raditz hasta la batalla final contra Majin Buu, los guerreros
-                  Z trascienden sus límites una y otra vez.
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-xl p-6 border border-purple-300/20">
-                <h3 className="text-2xl font-bold text-white mb-4">
-                  🌟 Dragon Ball Super
-                </h3>
-                <p className="text-white/90 leading-relaxed">
-                  Las aventuras continúan con nuevos niveles de poder como el
-                  Ultra Instinto y enfrentamientos con dioses de la destrucción.
-                  El multiverso se abre ante nuestros héroes en batallas que
-                  determinan el destino de universos enteros.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        <StorySection activeSection={activeSection} />
       </main>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-gray-900 to-black py-8 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-white/70">
-            © 2025 Dragon Ball Universe. Una aplicación web creada con ❤️ para
-            fans de Dragon Ball
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
