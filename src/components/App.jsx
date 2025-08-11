@@ -99,39 +99,120 @@ function App() {
     setSearchTerm(e.target.value);
   };
 
-  // FUNCIONES para calcular el valor de ki y pasar las palabras a números
-
+  // FUNCIÓN para parsear Ki
   function parseKiString(kiString) {
     if (!kiString) return 0;
 
     const text = kiString.toLowerCase().trim();
 
+    // Si es "0" o similar, retornar 0
+    if (text === "0" || text === "unknown" || text === "desconocido") {
+      return 0;
+    }
+
+    // Multipliers para palabras en inglés
     const multipliers = {
       septillion: 1e24,
+      sextillion: 1e21,
       quintillion: 1e18,
       quadrillion: 1e15,
       trillion: 1e12,
       billion: 1e9,
+      million: 1e6,
+      thousand: 1e3,
     };
 
-    // Buscar sufijo y extraer número antes del sufijo
-    for (const [key, value] of Object.entries(multipliers)) {
-      if (text.includes(key)) {
-        // Extraer el número antes del sufijo (ej: "5.5 billion")
-        const match = text.match(/([\d,.]+)\s*/);
+    // 1. PRIMERO: Buscar si tiene palabras multiplicadoras
+    for (const [word, value] of Object.entries(multipliers)) {
+      if (text.includes(word)) {
+        // Extraer el número antes de la palabra
+        const regex = new RegExp(`([\\d.,]+)\\s*${word}`, "i");
+        const match = text.match(regex);
         if (match) {
-          // Reemplazar comas y convertir a float
-          const numberPart = parseFloat(match[1].replace(/,/g, ""));
+          // Convertir el número (manejando tanto comas como puntos)
+          let numberPart = match[1].replace(/,/g, ""); // Remover comas si las hay
+          numberPart = parseFloat(numberPart);
           return isNaN(numberPart) ? 0 : numberPart * value;
         }
-        return 0;
       }
     }
 
-    // Si no tiene sufijo, intentar parsear directamente como número
+    // 2. SEGUNDO: Si no tiene palabras, parsear como número con puntos como separadores
+    // La API usa formato "60.000.000" donde los puntos son separadores de miles
 
-    const num = parseFloat(text.replace(/[^0-9.]/g, ""));
-    return isNaN(num) ? 0 : num;
+    // Contar cuántos puntos hay
+    const dotCount = (text.match(/\./g) || []).length;
+
+    if (dotCount > 1) {
+      // Múltiples puntos = separadores de miles (formato europeo)
+      // "60.000.000" -> "60000000"
+      const cleanedText = text.replace(/\./g, "");
+      const finalNumber = parseFloat(cleanedText);
+      return isNaN(finalNumber) ? 0 : finalNumber;
+    } else if (dotCount === 1) {
+      // Un solo punto: podría ser decimal o separador de miles
+      const parts = text.split(".");
+
+      if (parts[1] && parts[1].length === 3) {
+        // Si después del punto hay exactamente 3 dígitos, es separador de miles
+        // "530.000" -> "530000"
+        const cleanedText = text.replace(/\./g, "");
+        const finalNumber = parseFloat(cleanedText);
+        return isNaN(finalNumber) ? 0 : finalNumber;
+      } else {
+        // Sino, tratarlo como decimal
+        const finalNumber = parseFloat(text);
+        return isNaN(finalNumber) ? 0 : finalNumber;
+      }
+    } else {
+      // Sin puntos, número directo
+      const finalNumber = parseFloat(text.replace(/[^\d]/g, ""));
+      return isNaN(finalNumber) ? 0 : finalNumber;
+    }
+  }
+
+  // Función para testear el parser con ejemplos reales de la API
+  function testParser() {
+    const testCases = [
+      "60.000.000", // 60,000,000
+      "54.000.000", // 54,000,000
+      "2.000.000", // 2,000,000
+      "250.000.000", // 250,000,000
+      "45.000.000", // 45,000,000
+      "530.000", // 530,000
+      "20.000", // 20,000
+      "18.000", // 18,000
+      "9.000", // 9,000
+      "90 Septillion", // 90e24
+      "19.84 Septillion", // 19.84e24
+      "500.000.000", // 500,000,000
+      "52.71 Septillion", // 52.71e24
+      "5 Billion", // 5e9
+      "40 septillion", // 40e24
+      "0", // 0
+    ];
+
+    console.log("Pruebas del parser:");
+    testCases.forEach((test) => {
+      const result = parseKiString(test);
+      console.log(`"${test}" -> ${result.toLocaleString()}`);
+    });
+  }
+
+  // Ejecutar las pruebas
+  testParser();
+
+  // función auxiliar para mostrar valores de forma más legible
+  function formatKiForDisplay(kiValue) {
+    if (kiValue >= 1e24) return `${(kiValue / 1e24).toFixed(2)} Septillion`;
+    if (kiValue >= 1e21) return `${(kiValue / 1e21).toFixed(2)} Sextillion`;
+    if (kiValue >= 1e18) return `${(kiValue / 1e18).toFixed(2)} Quintillion`;
+    if (kiValue >= 1e15) return `${(kiValue / 1e15).toFixed(2)} Quadrillion`;
+    if (kiValue >= 1e12) return `${(kiValue / 1e12).toFixed(2)} Trillion`;
+    if (kiValue >= 1e9) return `${(kiValue / 1e9).toFixed(2)} Billion`;
+    if (kiValue >= 1e6) return `${(kiValue / 1e6).toFixed(2)} Million`;
+    if (kiValue >= 1e3) return `${(kiValue / 1e3).toFixed(2)} Thousand`;
+    return kiValue.toLocaleString();
   }
 
   const filteredByName = characters.filter((char) =>
@@ -234,6 +315,8 @@ function App() {
           summaryUpToTheFirstPoint={summaryUpToTheFirstPoint}
           loading={loading}
           error={error}
+          formatKiForDisplay={formatKiForDisplay}
+          parseKiString={parseKiString}
         />
         {/* Story Section */}
         <StorySection activeSection={activeSection} />
