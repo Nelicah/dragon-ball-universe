@@ -89,10 +89,20 @@ function App() {
     </button>
   );
 
-  function summaryUpToTheFirstPoint(text) {
+  //función para limitar la descripción de los personajes
+  function summaryUpToLimit(text, maxLength = 150) {
     if (!text) return "";
-    const index = text.indexOf(".");
-    return index !== -1 ? text.slice(0, index + 1) : text;
+    if (text.length <= maxLength) return text;
+
+    let truncated = text.slice(0, maxLength);
+
+    // Evitar cortar palabra a la mitad
+    const lastSpace = truncated.lastIndexOf(" ");
+    if (lastSpace > 0) {
+      truncated = truncated.slice(0, lastSpace);
+    }
+
+    return truncated + "...";
   }
 
   const handleSearchChange = (e) => {
@@ -214,6 +224,7 @@ function App() {
     if (kiValue >= 1e3) return `${(kiValue / 1e3).toFixed(2)} Thousand`;
     return kiValue.toLocaleString();
   }
+  // FIN FUNCIÓN para parsear Ki
 
   const filteredByName = characters.filter((char) =>
     char.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -312,7 +323,7 @@ function App() {
           setMinKi={setMinKi}
           setMaxKi={setMaxKi}
           activeSection={activeSection}
-          summaryUpToTheFirstPoint={summaryUpToTheFirstPoint}
+          summaryUpToLimit={summaryUpToLimit}
           loading={loading}
           error={error}
           formatKiForDisplay={formatKiForDisplay}

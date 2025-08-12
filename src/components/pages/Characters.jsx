@@ -1,7 +1,7 @@
 function Characters({
   characters,
   activeSection,
-  summaryUpToTheFirstPoint,
+  summaryUpToLimit,
   loading,
   error,
   searchTerm,
@@ -217,7 +217,7 @@ function Characters({
                     </div>
 
                     <p className="text-white/70 text-sm leading-relaxed">
-                      {summaryUpToTheFirstPoint(character.description)}
+                      {summaryUpToLimit(character.description)}
                     </p>
                   </div>
                 </div>
