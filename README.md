@@ -58,3 +58,16 @@ la API presenta valores de Ki en formatos mixtos (números y strings con magnitu
 ![Vista previa del proyecto, página principal](/public/dragon-ball1.png)
 **Personajes**
 ![Vista previa del proyecto, página de personajes](/public/dragon-ball2.png)
+
+---
+
+## 📜 Licencia
+
+Este proyecto fue desarrollado como ejercicio técnico y no tiene fines comerciales.
+Los personajes y nombres pertenecen a Dragon Ball y sus respectivos creadores.
+
+## 📬 Contacto
+
+💼 [LinkedIn](www.linkedin.com/in/cande-zamora-125301349)
+
+📧 candezmr2@gmail.com
