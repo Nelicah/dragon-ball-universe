@@ -4,6 +4,13 @@ Este proyecto es un ejercicio técnico que implementa una aplicación web intera
 Permite buscar por nombre y filtrar por nivel de Ki, resolviendo un reto especial:
 la API presenta valores de Ki en formatos mixtos (números y strings con magnitudes como "Billion" o "Septillion"), lo que requirió crear un parser robusto capaz de normalizar todos esos formatos para realizar filtrados precisos.
 
+## 📸 Vista previa
+
+**Home**
+![Vista previa del proyecto, página principal](/public/dragon-ball1.png)
+**Personajes**
+![Vista previa del proyecto, página de personajes](/public/dragon-ball2.png)
+
 ---
 
 ## 🚀 Funcionalidades principales
@@ -14,6 +21,7 @@ la API presenta valores de Ki en formatos mixtos (números y strings con magnitu
 - Diseño responsive y visualmente atractivo con degradados, iconografía y transiciones suaves.
 - Navegación adaptativa con menú de escritorio y versión móvil desplegable.
 - Sección de historia para contextualizar el universo.
+- Carga optimizada con Lazy loading para mejor rendimiento.
 
 ---
 
@@ -23,10 +31,10 @@ la API presenta valores de Ki en formatos mixtos (números y strings con magnitu
 
 - La API devuelve datos como 60.000.000, 5 Billion o 19.84 Septillion.
 - Se desarrolló una función parseKiString() que:
-- Interpreta magnitudes (Million, Billion, Trillion, Septillion…).
-- Convierte formatos con separadores europeos (60.000.000 → 60000000).
-- Maneja casos especiales como "unknown" o "desconocido".
-- Esto permite filtrar de forma precisa por rangos numéricos.
+  - Interpreta magnitudes (Million, Billion, Trillion, Septillion…).
+  - Convierte formatos con separadores europeos (60.000.000 → 60000000).
+  - Maneja casos especiales como "unknown" o "desconocido".
+  - Esto permite filtrar de forma precisa por rangos numéricos.
 
 2. Estructura modular
 
@@ -40,6 +48,11 @@ la API presenta valores de Ki en formatos mixtos (números y strings con magnitu
 - Iconos de lucide-react para reforzar la experiencia visual.
 - Animaciones sutiles en botones activos y transiciones suaves.
 
+4. Optimizaciones de Rendimiento
+
+- Lazy Loading: Las imágenes se cargan solo cuando son visibles
+- Responsive Design: Grid adaptativo según el tamaño de pantalla
+
 ---
 
 ## 🛠️ Tecnologías utilizadas
@@ -52,19 +65,18 @@ la API presenta valores de Ki en formatos mixtos (números y strings con magnitu
 
 ---
 
-## 📸 Vista previa
-
-**Home**
-![Vista previa del proyecto, página principal](/public/dragon-ball1.png)
-**Personajes**
-![Vista previa del proyecto, página de personajes](/public/dragon-ball2.png)
-
----
-
 ## 📜 Licencia
 
 Este proyecto fue desarrollado como ejercicio técnico y no tiene fines comerciales.
 Los personajes y nombres pertenecen a Dragon Ball y sus respectivos creadores.
+
+---
+
+## 🙏 Agradecimientos
+
+- [Dragon Ball API](https://web.dragonball-api.com/documentation) por proporcionar los datos
+- Akira Toriyama por crear el universo de Dragon Ball
+- La comunidad de React por las herramientas increíbles
 
 ## 📬 Contacto
 
