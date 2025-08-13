@@ -72,12 +72,6 @@ Los personajes y nombres pertenecen a Dragon Ball y sus respectivos creadores.
 
 ---
 
-## 🙏 Agradecimientos
-
-- [Dragon Ball API](https://web.dragonball-api.com/documentation) por proporcionar los datos
-- Akira Toriyama por crear el universo de Dragon Ball
-- La comunidad de React por las herramientas increíbles
-
 ## 📬 Contacto
 
 💼 [LinkedIn](www.linkedin.com/in/cande-zamora-125301349)
